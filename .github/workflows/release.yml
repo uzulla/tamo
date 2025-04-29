@@ -21,12 +21,18 @@ jobs:
           go-version: 'stable'
           check-latest: true
           
-      - name: Get release
+      - name: Get release info
         id: get_release
-        uses: bruceadams/get-release@v1.3.2
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const release = await github.rest.repos.getRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: context.payload.release.id
+            });
+            core.setOutput('upload_url', release.data.upload_url);
+            
       - name: Build Linux AMD64 binary
         run: |
           GOOS=linux GOARCH=amd64 go build -o tamo-linux-amd64 ./cmd/tamo
@@ -39,32 +45,13 @@ jobs:
         run: |
           GOOS=darwin GOARCH=arm64 go build -o tamo-darwin-arm64 ./cmd/tamo
           
-      - name: Upload Linux AMD64 binary
-        uses: actions/upload-release-asset@v1
+      - name: Upload binaries to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            tamo-linux-amd64
+            tamo-linux-arm64
+            tamo-darwin-arm64
+          tag_name: ${{ github.event.release.tag_name }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: ${{ steps.get_release.outputs.upload_url }}
-          asset_path: ./tamo-linux-amd64
-          asset_name: tamo-linux-amd64
-          asset_content_type: application/octet-stream
-          
-      - name: Upload Linux ARM64 binary
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: ${{ steps.get_release.outputs.upload_url }}
-          asset_path: ./tamo-linux-arm64
-          asset_name: tamo-linux-arm64
-          asset_content_type: application/octet-stream
-          
-      - name: Upload Darwin ARM64 binary
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: ${{ steps.get_release.outputs.upload_url }}
-          asset_path: ./tamo-darwin-arm64
-          asset_name: tamo-darwin-arm64
-          asset_content_type: application/octet-stream
