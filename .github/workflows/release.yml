@@ -24,6 +24,10 @@ jobs:
         id: get_tag
         run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
         
+      - name: Print working directory
+        run: pwd
+      - name: Print environment variables
+        run: env
       - name: Build Linux AMD64 binary
         run: |
           GOOS=linux GOARCH=amd64 go build -o tamo-linux-amd64 ./cmd/tamo
