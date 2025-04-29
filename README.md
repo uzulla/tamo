@@ -33,6 +33,47 @@ sudo mv tamo /usr/local/bin/
 go install github.com/zishida/tamo/cmd/tamo@latest
 ```
 
+### From GitHub Releases
+
+Pre-built binaries for multiple platforms are available on the [GitHub Releases](https://github.com/zishida/tamo/releases) page. These binaries are automatically built and published by GitHub Actions whenever a new tag is pushed to the repository.
+
+Available platforms:
+- Linux AMD64
+- Linux ARM64
+- Darwin ARM64 (macOS Apple Silicon)
+
+To download and install:
+1. Visit the [Releases page](https://github.com/zishida/tamo/releases)
+2. Download the appropriate binary for your platform
+3. Make it executable: `chmod +x tamo-<platform>`
+4. Move it to a directory in your PATH: `sudo mv tamo-<platform> /usr/local/bin/tamo`
+
+## Continuous Integration and Deployment
+
+Tamo uses GitHub Actions for automated testing and releases:
+
+### Automated Testing
+
+Tests are automatically run on:
+- Every push to the main branch
+- Every pull request
+
+This ensures code quality and prevents regressions.
+
+### Automated Releases
+
+When a new tag is pushed to the repository, GitHub Actions will automatically:
+1. Build binaries for multiple platforms (Linux AMD64, Linux ARM64, Darwin ARM64)
+2. Create a new GitHub Release with the tag name
+3. Attach the built binaries as assets to the release
+
+To create a new release:
+```bash
+# Create and push a tag
+git tag v1.0.0
+git push origin v1.0.0
+```
+
 ## Getting Started
 
 ### Initialize Tamo
