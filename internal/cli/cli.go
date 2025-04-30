@@ -739,15 +739,7 @@ func (c *CLI) executeShow(args []string) error {
                 fmt.Printf("Updated: %s\n", memo.UpdatedAt.Format("2006-01-02 15:04:05"))
 
                 // Find tasks that reference this memo
-                var referencingTasks []*model.Task
-                for _, task := range store.Tasks {
-                        for _, memoRef := range task.MemoRefs {
-                                if memoRef == memo.ID {
-                                        referencingTasks = append(referencingTasks, task)
-                                        break
-                                }
-                        }
-                }
+                referencingTasks := findTasksReferencingMemo(store, memo.ID)
 
                 // Display referencing tasks if any
                 if len(referencingTasks) > 0 {
