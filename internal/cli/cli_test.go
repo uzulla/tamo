@@ -457,12 +457,12 @@ func TestExecuteFlattask(t *testing.T) {
 	}
 
 	// Extract memo ID from output
-	idStart := strings.Index(output, "Memo added with ID: ") + len("Memo added with ID: ")
-	if idStart >= len("Memo added with ID: ") {
-		memoID = strings.TrimSpace(output[idStart:])
-	} else {
-		t.Fatalf("Failed to extract memo ID from output: %s", output)
+	index := strings.Index(output, "Memo added with ID: ")
+	if index == -1 {
+		t.Fatalf("Failed to find 'Memo added with ID:' in output: %s", output)
 	}
+	idStart := index + len("Memo added with ID: ")
+	memoID = strings.TrimSpace(output[idStart:])
 
 	// Add a task with memo reference
 	var taskID string
@@ -534,12 +534,12 @@ func TestExecuteShow(t *testing.T) {
 	}
 
 	// Extract memo ID from output
-	idStart := strings.Index(output, "Memo added with ID: ") + len("Memo added with ID: ")
-	if idStart >= len("Memo added with ID: ") {
-		memoID = strings.TrimSpace(output[idStart:])
-	} else {
-		t.Fatalf("Failed to extract memo ID from output: %s", output)
+	index := strings.Index(output, "Memo added with ID: ")
+	if index == -1 {
+		t.Fatalf("Failed to find 'Memo added with ID:' in output: %s", output)
 	}
+	idStart := index + len("Memo added with ID: ")
+	memoID = strings.TrimSpace(output[idStart:])
 
 	// Add a task with memo reference
 	var taskID string

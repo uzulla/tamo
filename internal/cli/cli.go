@@ -740,6 +740,8 @@ func (c *CLI) executeShow(args []string) error {
 
 		referencingTasks := findTasksReferencingMemo(store, memo.ID)
 		if len(referencingTasks) > 0 {
+			// Sort tasks for consistent display order
+			sortTasksByOrder(referencingTasks)
 			fmt.Println("\nReference Tasks:")
 			for _, task := range referencingTasks {
 				fmt.Printf("%s %s\n", task.ID[:8], task.Title)
