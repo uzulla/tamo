@@ -64,6 +64,7 @@ tamo initialized successfully
 - Copilotからのレビューコメントに対応
   1. 参照タスクの表示順序を一貫させるために`sortTasksByOrder`関数を使用
   2. テストコードでのメモID抽出処理をより堅牢に改善（`strings.Index`の戻り値が-1の場合を明示的にチェック）
+  3. タスクID抽出処理もメモID抽出処理と同様に改善し、一貫性と堅牢性を向上
 
 ## 問題点と解決策
 - 特になし。既存の`findTasksReferencingMemo`関数が既に実装されていたため、スムーズに実装できた。

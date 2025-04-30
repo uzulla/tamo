@@ -474,12 +474,12 @@ func TestExecuteFlattask(t *testing.T) {
 	}
 
 	// Extract task ID from output
-	index := strings.Index(output, "Task added with ID: ")
-	if index == -1 {
+	taskIndex := strings.Index(output, "Task added with ID: ")
+	if taskIndex == -1 {
 		t.Fatalf("Failed to find 'Task added with ID:' in output: %s", output)
 	}
-	idStart := index + len("Task added with ID: ")
-	taskID = strings.TrimSpace(output[idStart:])
+	taskIdStart := taskIndex + len("Task added with ID: ")
+	taskID = strings.TrimSpace(output[taskIdStart:])
 
 	// Test flattask command
 	output, err = captureOutput(func() error {
@@ -551,12 +551,12 @@ func TestExecuteShow(t *testing.T) {
 	}
 
 	// Extract task ID from output
-	index := strings.Index(output, "Task added with ID: ")
-	if index == -1 {
+	taskIndex := strings.Index(output, "Task added with ID: ")
+	if taskIndex == -1 {
 		t.Fatalf("Failed to find 'Task added with ID:' in output: %s", output)
 	}
-	idStart := index + len("Task added with ID: ")
-	taskID = strings.TrimSpace(output[idStart:])
+	taskIdStart := taskIndex + len("Task added with ID: ")
+	taskID = strings.TrimSpace(output[taskIdStart:])
 
 	output, err = captureOutput(func() error {
 		return cli.executeShow([]string{memoID})
