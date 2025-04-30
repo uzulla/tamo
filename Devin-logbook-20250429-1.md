@@ -30,6 +30,8 @@
 // Find and display referencing tasks
 referencingTasks := findTasksReferencingMemo(store, memo.ID)
 if len(referencingTasks) > 0 {
+    // Sort tasks for consistent display order
+    sortTasksByOrder(referencingTasks)
     fmt.Println("\nReference Tasks:")
     for _, task := range referencingTasks {
         fmt.Printf("%s %s\n", task.ID[:8], task.Title)
@@ -58,6 +60,11 @@ tamo initialized successfully
 --- PASS: TestExecuteShow (0.00s)
 ```
 
+#### 5. コードレビュー対応
+- Copilotからのレビューコメントに対応
+  1. 参照タスクの表示順序を一貫させるために`sortTasksByOrder`関数を使用
+  2. テストコードでのメモID抽出処理をより堅牢に改善（`strings.Index`の戻り値が-1の場合を明示的にチェック）
+
 ## 問題点と解決策
 - 特になし。既存の`findTasksReferencingMemo`関数が既に実装されていたため、スムーズに実装できた。
 
@@ -67,3 +74,4 @@ tamo initialized successfully
 ## 学びと洞察
 - Goのテストフレームワークは非常に使いやすく、機能テストが簡単に書ける
 - CLIアプリケーションの出力テストには、標準出力をキャプチャする方法が効果的
+- コードレビューでの小さな改善が、コードの堅牢性と一貫性を高める
