@@ -457,12 +457,12 @@ func TestExecuteFlattask(t *testing.T) {
 	}
 
 	// Extract memo ID from output
-	idStart := strings.Index(output, "Memo added with ID: ") + len("Memo added with ID: ")
-	if idStart >= len("Memo added with ID: ") {
-		memoID = strings.TrimSpace(output[idStart:])
-	} else {
-		t.Fatalf("Failed to extract memo ID from output: %s", output)
+	index := strings.Index(output, "Memo added with ID: ")
+	if index == -1 {
+		t.Fatalf("Failed to find 'Memo added with ID:' in output: %s", output)
 	}
+	idStart := index + len("Memo added with ID: ")
+	memoID = strings.TrimSpace(output[idStart:])
 
 	// Add a task with memo reference
 	var taskID string
@@ -474,12 +474,12 @@ func TestExecuteFlattask(t *testing.T) {
 	}
 
 	// Extract task ID from output
-	idStart = strings.Index(output, "Task added with ID: ") + len("Task added with ID: ")
-	if idStart >= len("Task added with ID: ") {
-		taskID = strings.TrimSpace(output[idStart:])
-	} else {
-		t.Fatalf("Failed to extract task ID from output: %s", output)
+	taskIndex := strings.Index(output, "Task added with ID: ")
+	if taskIndex == -1 {
+		t.Fatalf("Failed to find 'Task added with ID:' in output: %s", output)
 	}
+	taskIdStart := taskIndex + len("Task added with ID: ")
+	taskID = strings.TrimSpace(output[taskIdStart:])
 
 	// Test flattask command
 	output, err = captureOutput(func() error {
@@ -496,5 +496,100 @@ func TestExecuteFlattask(t *testing.T) {
 
 	if !strings.Contains(output, "Test Memo") {
 		t.Errorf("Expected output to contain memo title, got: %s", output)
+	}
+}
+
+// TestExecuteShow tests the show command
+func TestExecuteShow(t *testing.T) {
+	// Create a temporary directory for testing
+	tempDir, err := os.MkdirTemp("", "tamo-test")
+	if err != nil {
+		t.Fatalf("Failed to create temp dir: %v", err)
+	}
+	defer os.RemoveAll(tempDir)
+
+	// Change to the temporary directory
+	oldWd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current directory: %v", err)
+	}
+	if err := os.Chdir(tempDir); err != nil {
+		t.Fatalf("Failed to change to temp dir: %v", err)
+	}
+	defer os.Chdir(oldWd)
+
+	// Initialize tamo
+	cli := NewCLI()
+	if err := cli.executeInit([]string{}); err != nil {
+		t.Fatalf("Failed to initialize tamo: %v", err)
+	}
+
+	// Add a memo
+	var memoID string
+	output, err := captureOutput(func() error {
+		return cli.executeAddMemo([]string{"Test Memo", "-c", "Test Memo Content"})
+	})
+	if err != nil {
+		t.Fatalf("Failed to add memo: %v", err)
+	}
+
+	// Extract memo ID from output
+	index := strings.Index(output, "Memo added with ID: ")
+	if index == -1 {
+		t.Fatalf("Failed to find 'Memo added with ID:' in output: %s", output)
+	}
+	idStart := index + len("Memo added with ID: ")
+	memoID = strings.TrimSpace(output[idStart:])
+
+	// Add a task with memo reference
+	var taskID string
+	output, err = captureOutput(func() error {
+		return cli.executeAddTask([]string{"Test Task", "-d", "Test Description", "-m", memoID}, "add")
+	})
+	if err != nil {
+		t.Fatalf("Failed to add task: %v", err)
+	}
+
+	// Extract task ID from output
+	taskIndex := strings.Index(output, "Task added with ID: ")
+	if taskIndex == -1 {
+		t.Fatalf("Failed to find 'Task added with ID:' in output: %s", output)
+	}
+	taskIdStart := taskIndex + len("Task added with ID: ")
+	taskID = strings.TrimSpace(output[taskIdStart:])
+
+	output, err = captureOutput(func() error {
+		return cli.executeShow([]string{memoID})
+	})
+
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	// Check that the output contains the reference tasks section
+	if !strings.Contains(output, "Reference Tasks:") {
+		t.Errorf("Expected output to contain 'Reference Tasks:', got: %s", output)
+	}
+
+	// Check that the output contains the task ID and title
+	if !strings.Contains(output, taskID[:8]) || !strings.Contains(output, "Test Task") {
+		t.Errorf("Expected output to contain task ID and title, got: %s", output)
+	}
+
+	// Test show task command
+	output, err = captureOutput(func() error {
+		return cli.executeShow([]string{taskID})
+	})
+
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	if !strings.Contains(output, "Test Task") || !strings.Contains(output, "Test Description") {
+		t.Errorf("Expected output to contain task title and description, got: %s", output)
+	}
+
+	if !strings.Contains(output, "Referenced Memos:") || !strings.Contains(output, memoID[:8]) {
+		t.Errorf("Expected output to contain memo reference, got: %s", output)
 	}
 }
